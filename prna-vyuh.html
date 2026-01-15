@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI-Powered Traffic Management System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Poppins', sans-serif; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+<!-- ================= FRONTEND UI ================= -->
+<nav class="bg-white shadow-md fixed w-full z-50">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    <h1 class="text-xl font-bold text-blue-600">AI Traffic Management</h1>
+    <span class="text-sm text-gray-500">Roboflow + Arduino Backend</span>
+  </div>
+</nav>
+
+<section class="pt-28 max-w-7xl mx-auto px-6 py-16">
+  <h2 class="text-4xl font-bold mb-6">Live Object Detection Dashboard</h2>
+  <p class="text-gray-600 mb-8">Upload an image or frame from CCTV to detect vehicles and emergency services using Roboflow.</p>
+
+  <input type="file" id="imageInput" class="mb-4" />
+  <button onclick="sendImage()" class="bg-blue-600 text-white px-6 py-2 rounded-lg">Run Detection</button>
+
+  <div class="mt-8">
+    <img id="preview" class="max-w-md rounded-xl shadow mb-4" />
+    <pre id="result" class="bg-black text-green-400 p-4 rounded-lg text-sm"></pre>
+  </div>
+</section>
+
+<footer class="bg-blue-600 text-white py-6 text-center">
+  <p>© 2026 AI-Powered Traffic Management System | VIT Pune</p>
+</footer>
+
+<!-- ================= FRONTEND SCRIPT ================= -->
+<script>
+function sendImage() {
+  const input = document.getElementById('imageInput');
+  const file = input.files[0];
+  if (!file) return alert('Please upload an image');
+
+  document.getElementById('preview').src = URL.createObjectURL(file);
+
+  const formData = new FormData();
+  formData.append('image', file);
+
+  fetch('http://localhost:5000/detect', {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+  })
+  .catch(err => alert('Backend not running'));
+}
+</script>
+
+<!-- ================= BACKEND (PYTHON – FLASK) =================
+SAVE THIS AS app.py
+--------------------------------------------------
+from flask import Flask, request, jsonify
+import requests
+import base64
+
+app = Flask(__name__)
+
+ROBOFLOW_API_KEY = "YOUR_API_KEY"
+MODEL = "traffic-detection/1"   # change to your model
+
+@app.route('/detect', methods=['POST'])
+def detect():
+    image = request.files['image']
+    encoded = base64.b64encode(image.read()).decode('utf-8')
+
+    url = f"https://detect.roboflow.com/{MODEL}?api_key={ROBOFLOW_API_KEY}"
+    response = requests.post(url, data=encoded, headers={"Content-Type": "application/x-www-form-urlencoded"})
+
+    return jsonify(response.json())
+
+if __name__ == '__main__':
+    app.run(debug=True)
+--------------------------------------------------
+INSTALL REQUIREMENTS:
+  pip install flask requests
+
+RUN:
+  python app.py
+================================================== -->
+
+</body>
+</html>
