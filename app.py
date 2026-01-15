@@ -7,7 +7,7 @@ import base64
 
 app = Flask(__name__)
 
-ROBOFLOW_API_KEY = "YOUR_API_KEY"
+ROBOFLOW_API_KEY = "RJVsuf7wVUXCCYtfuawt"
 MODEL = "traffic-detection/1"   # change to your model
 
 @app.route('/detect', methods=['POST'])
@@ -15,7 +15,7 @@ def detect():
     image = request.files['image']
     encoded = base64.b64encode(image.read()).decode('utf-8')
 
-    url = f"https://detect.roboflow.com/{MODEL}?api_key={ROBOFLOW_API_KEY}"
+    url = f"https://serverless.roboflow.com api_key="RJVsuf7wVUXCCYtfuawt"
     response = requests.post(url, data=encoded, headers={"Content-Type": "application/x-www-form-urlencoded"})
 
     return jsonify(response.json())
